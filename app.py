@@ -16,6 +16,7 @@ import json
 import math
 import os
 import re
+import time
 import unicodedata
 import uuid
 
@@ -23,11 +24,17 @@ import numpy as np
 
 from flask import Flask, flash, redirect, render_template_string, request, session, url_for
 
+try:
+    import mlflow
+except Exception:  # MLflow es opcional; si no está instalado, la app sigue funcionando.
+    mlflow = None
+
 # ---------- Configuración ----------
 MODELO = "nomic-embed-text"
 PREFIJO = "clustering: "  # el mismo prefijo para consulta y textos
 LOTE = 32                 # textos por llamada a Ollama
 MAX_PALABRAS = 40         # palabras que se analizan por texto en la pestaña Explicación
+NOMBRE_EXPERIMENTO_MLFLOW = "similitud"
 
 DEFAULT_TUNING = {
     "modelo": MODELO,
@@ -42,6 +49,54 @@ DEFAULT_TUNING = {
 app = Flask(__name__)
 app.secret_key = "cambia-esto-si-lo-publicas"
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5 MB máximo por archivo
+
+
+def preparar_experimento_mlflow():
+    """Asegura que exista un experimento activo para registrar runs."""
+    if mlflow is None:
+        return None
+
+    try:
+        mlflow.set_tracking_uri("http://localhost:5003")
+    except Exception:
+        pass
+
+    nombre = NOMBRE_EXPERIMENTO_MLFLOW
+    try:
+        exp = mlflow.get_experiment_by_name(nombre)
+        if exp is not None:
+            if exp.lifecycle_stage == "active":
+                mlflow.set_experiment(nombre)
+                return exp.experiment_id
+            try:
+                mlflow.restore_experiment(exp.experiment_id)
+                mlflow.set_experiment(nombre)
+                exp = mlflow.get_experiment_by_name(nombre)
+                if exp is not None and exp.lifecycle_stage == "active":
+                    return exp.experiment_id
+            except Exception:
+                pass
+
+        try:
+            nuevo_id = mlflow.create_experiment(nombre)
+            mlflow.set_experiment(nombre)
+            return nuevo_id
+        except Exception:
+            try:
+                mlflow.set_experiment(nombre)
+                exp2 = mlflow.get_experiment_by_name(nombre)
+                if exp2 is not None:
+                    return exp2.experiment_id
+            except Exception:
+                pass
+            return None
+    except Exception:
+        return None
+
+
+if mlflow is not None:
+    # El flujo de la app se sirve en 5001; MLflow debe vivir en otro puerto para no chocar.
+    preparar_experimento_mlflow()
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 ARCHIVO = os.path.join(BASE, "textos.json")
@@ -647,7 +702,7 @@ def borrar_todo():
     guardar([])
     escribir_json(CACHE, {})
     flash(f"Se borraron {cantidad} textos." if cantidad else "No había textos que borrar.", "ok")
-    return redirect(url_for("inicio"))
+    return redirect(url_for("ianicio"))
 
 
 def consulta_actual():
@@ -684,7 +739,59 @@ def busqueda():
 
     if consulta and items:
         try:
+            inicio_calculo = time.perf_counter()
             resultados, _ = puntuar(consulta, items, modelo=modelo, prefijo=cfg["prefijo"], metrica=cfg["metrica"])
+            tiempo_resolucion = time.perf_counter() - inicio_calculo
+
+            if mlflow is not None and resultados:
+                exp_id = preparar_experimento_mlflow()
+                nombre_modelo_run = re.sub(r"[^A-Za-z0-9._-]+", "-", modelo).strip("-") or "modelo"
+                with mlflow.start_run(
+                    run_name=f"{nombre_modelo_run}-{uuid.uuid4().hex[:8]}",
+                    experiment_id=exp_id,
+                ):
+                    mlflow.log_param("query", consulta)
+                    mlflow.log_param("modelo", modelo)
+                    mlflow.log_param("metrica", cfg["metrica"])
+                    mlflow.log_metric("total_resultados", float(len(resultados)))
+                    mlflow.log_metric("max_similitud", float(resultados[0]["score"]))
+                    mlflow.log_metric("time_to_complete_seconds", tiempo_resolucion)
+
+                    metricas_registradas = set()
+                    for idx, item in enumerate(resultados):
+                        rank = idx + 1
+                        texto_metrica = unicodedata.normalize(
+                            "NFKD", str(item["texto"])
+                        ).encode("ascii", "ignore").decode("ascii").lower()
+                        texto_metrica = re.sub(r"[^a-z0-9]+", "_", texto_metrica).strip("_")
+                        texto_metrica = texto_metrica[:180].strip("_") or f"resultado_{rank}"
+                        nombre_metrica = f"similitud_{texto_metrica}"
+                        if nombre_metrica in metricas_registradas:
+                            nombre_metrica = f"{nombre_metrica}_rank_{rank}"
+                        metricas_registradas.add(nombre_metrica)
+                        mlflow.log_metric(nombre_metrica, float(item["score"]))
+                        mlflow.log_param(
+                            f"texto_rank_{rank}_vista_previa",
+                            f"{str(item['texto'])[:220]} | similitud={float(item['score']):.6f}",
+                        )
+
+                    textos_y_evaluaciones = [
+                        {
+                            "rank": idx + 1,
+                            "texto": item["texto"],
+                            "score": float(item["score"]),
+                        }
+                        for idx, item in enumerate(resultados)
+                    ]
+                    mlflow.log_dict(
+                        {
+                            "query": consulta,
+                            "modelo": modelo,
+                            "metrica": cfg["metrica"],
+                            "textos_y_evaluaciones": textos_y_evaluaciones,
+                        },
+                        "textos_y_evaluaciones.json",
+                    )
         except Exception as e:  # Ollama apagado, modelo sin descargar, etc.
             error = (
                 f"No se pudo calcular la similitud: {e}. "

@@ -1,0 +1,27 @@
+{
+  "query": "necesito descansar ahora",
+  "modelo": "nomic-embed-text:latest",
+  "metrica": "coseno",
+  "textos_y_evaluaciones": [
+    {
+      "rank": 1,
+      "texto": "necesito descansar, tu tambien",
+      "score": 0.9639040857699965
+    },
+    {
+      "rank": 2,
+      "texto": "Vamos a descansar",
+      "score": 0.9241860336638633
+    },
+    {
+      "rank": 3,
+      "texto": "vayamos a trabajar",
+      "score": 0.8366434880733965
+    },
+    {
+      "rank": 4,
+      "texto": "me canse de hacer tareas",
+      "score": 0.8325251068224687
+    }
+  ]
+}

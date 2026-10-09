@@ -1,0 +1,31 @@
+{
+  "query": "validar texto en mlflow",
+  "modelo": "nomic-embed-text:latest",
+  "metrica": "coseno",
+  "textos_y_evaluaciones": [
+    {
+      "rank": 0,
+      "id": "ee4af8ae79b044ea9919311ae2c500c1",
+      "texto": "vayamos a trabajar",
+      "score": 0.7524271445689621
+    },
+    {
+      "rank": 1,
+      "id": "6bcd0e5c8bff4b4bb6b872a7858deb08",
+      "texto": "me canse de hacer tareas",
+      "score": 0.7467820463506833
+    },
+    {
+      "rank": 2,
+      "id": "882c3ac97708490a8e477bb6908ddfde",
+      "texto": "Vamos a descansar",
+      "score": 0.743302168778633
+    },
+    {
+      "rank": 3,
+      "id": "3eb18e815a444fc7a2fde6908f8223ee",
+      "texto": "necesito descansar, tu tambien",
+      "score": 0.7284630690440712
+    }
+  ]
+}

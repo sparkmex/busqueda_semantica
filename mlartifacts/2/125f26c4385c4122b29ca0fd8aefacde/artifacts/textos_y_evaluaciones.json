@@ -1,0 +1,27 @@
+{
+  "query": "validar modelo nombres",
+  "modelo": "nomic-embed-text:latest",
+  "metrica": "coseno",
+  "textos_y_evaluaciones": [
+    {
+      "rank": 1,
+      "texto": "vayamos a trabajar",
+      "score": 0.8084393850561878
+    },
+    {
+      "rank": 2,
+      "texto": "me canse de hacer tareas",
+      "score": 0.789663656747302
+    },
+    {
+      "rank": 3,
+      "texto": "Vamos a descansar",
+      "score": 0.7860762251047827
+    },
+    {
+      "rank": 4,
+      "texto": "necesito descansar, tu tambien",
+      "score": 0.7800525326101145
+    }
+  ]
+}

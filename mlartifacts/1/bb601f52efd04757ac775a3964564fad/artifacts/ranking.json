@@ -1,0 +1,25 @@
+{
+  "query": "perro casa",
+  "modelo": "nomic-embed-text:latest",
+  "metrica": "coseno",
+  "ranking": [
+    {
+      "rank": 0,
+      "id": "a1",
+      "texto": "El gato duerme en la casa",
+      "score": 0.8741690972311812
+    },
+    {
+      "rank": 1,
+      "id": "b2",
+      "texto": "El perro juega en el jard\u00edn",
+      "score": 0.8396562207683324
+    },
+    {
+      "rank": 2,
+      "id": "c3",
+      "texto": "La ciudad tiene muchos edificios",
+      "score": 0.7887184401735073
+    }
+  ]
+}

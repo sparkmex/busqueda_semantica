@@ -1,0 +1,27 @@
+{
+  "query": "medir tiempo de busqueda",
+  "modelo": "nomic-embed-text:latest",
+  "metrica": "coseno",
+  "textos_y_evaluaciones": [
+    {
+      "rank": 1,
+      "texto": "vayamos a trabajar",
+      "score": 0.8389045732770386
+    },
+    {
+      "rank": 2,
+      "texto": "necesito descansar, tu tambien",
+      "score": 0.8376345756128663
+    },
+    {
+      "rank": 3,
+      "texto": "me canse de hacer tareas",
+      "score": 0.8374843482381333
+    },
+    {
+      "rank": 4,
+      "texto": "Vamos a descansar",
+      "score": 0.8197456464140196
+    }
+  ]
+}

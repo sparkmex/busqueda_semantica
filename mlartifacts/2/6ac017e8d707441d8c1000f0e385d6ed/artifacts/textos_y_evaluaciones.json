@@ -1,0 +1,27 @@
+{
+  "query": "validar texto y score",
+  "modelo": "nomic-embed-text:latest",
+  "metrica": "coseno",
+  "textos_y_evaluaciones": [
+    {
+      "rank": 0,
+      "texto": "vayamos a trabajar",
+      "score": 0.7737261129461521
+    },
+    {
+      "rank": 1,
+      "texto": "me canse de hacer tareas",
+      "score": 0.7687452564380449
+    },
+    {
+      "rank": 2,
+      "texto": "Vamos a descansar",
+      "score": 0.7623737604198361
+    },
+    {
+      "rank": 3,
+      "texto": "necesito descansar, tu tambien",
+      "score": 0.7517962379854245
+    }
+  ]
+}

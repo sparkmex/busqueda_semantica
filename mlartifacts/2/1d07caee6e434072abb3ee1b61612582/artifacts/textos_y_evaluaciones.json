@@ -1,0 +1,27 @@
+{
+  "query": "prueba sin ids",
+  "modelo": "nomic-embed-text:latest",
+  "metrica": "coseno",
+  "textos_y_evaluaciones": [
+    {
+      "rank": 0,
+      "texto": "vayamos a trabajar",
+      "score": 0.7492807229686125
+    },
+    {
+      "rank": 1,
+      "texto": "me canse de hacer tareas",
+      "score": 0.7310294897220815
+    },
+    {
+      "rank": 2,
+      "texto": "Vamos a descansar",
+      "score": 0.7206686722875929
+    },
+    {
+      "rank": 3,
+      "texto": "necesito descansar, tu tambien",
+      "score": 0.71061983507541
+    }
+  ]
+}
