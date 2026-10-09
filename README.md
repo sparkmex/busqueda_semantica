@@ -15,8 +15,29 @@ Aplicación web para guardar textos, calcular embeddings con Ollama y comparar c
 
 - Python 3.13+
 - Ollama instalado y corriendo localmente.
-- Un modelo de embeddings descargado, por ejemplo:
-  - `nomic-embed-text`
+- Un modelo de embeddings descargado.
+
+## Modelos compatibles con embeddings
+
+Estos son ejemplos de modelos que suelen funcionar bien con Ollama para embeddings semánticos:
+
+- `nomic-embed-text`
+- `bge-large`
+- `all-minilm`
+- `mxbai-embed-large`
+- `snowflake-arctic-embed`
+- `mistral-small3.2` (siempre que la versión de Ollama lo soporte para embeddings)
+
+Puedes listarlos y descargarlos con comandos como:
+
+```bash
+ollama list
+ollama pull nomic-embed-text
+ollama pull bge-large
+ollama pull all-minilm
+```
+
+> La app intenta detectar automáticamente modelos compatibles en Ollama. Si no aparece alguno, puedes escribir el nombre manualmente desde la interfaz de tuning.
 
 ## Instalación
 
